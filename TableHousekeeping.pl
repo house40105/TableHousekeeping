@@ -71,13 +71,13 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
         $db_backup = $NMOSS3G_keep_value * 3600 * 24;
 
         my $Clean_backup_tablename = $NMOSS3G_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
-        logger("INFO:Housekeeping DB by Day TABLE = $Clean_backup_tablename%");
+        logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS3G_keep_value)");
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         
         my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        print("NMOSS3G_count: ".$NMOSS3G_count."\n");
+        # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
     }
     if($NMOSS3G_keep_type =~ /COUNT/)
     {
@@ -105,10 +105,10 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
         $db_backup = $NMOSS4G_keep_value * 3600 * 24;
 
         my $Clean_backup_tablename = $NMOSS4G_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
-        logger("INFO:Housekeeping DB by Day TABLE = $Clean_backup_tablename%");
+        logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS4G_keep_value)");
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
 
         my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         print("NMOSS4G_count: ".$NMOSS4G_count."\n");
@@ -140,10 +140,10 @@ if($EnableMENU =~ /HinetIPTable/)
         $db_backup = $HinetIPTable_keep_value * 3600 * 24;
 
         my $Clean_backup_tablename = $HinetIPTable_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
-        logger("INFO:Housekeeping DB by Day TABLE=$Clean_backup_tablename%");
+        logger("INFO:START DROP TABLES BY DAY (Keeping Day: $HinetIPTable_keep_value)");
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($HinetIPTable_keep_type =~ /COUNT/)
     {
@@ -212,15 +212,13 @@ sub drop_table
 sub drop_table_list
 {
     my($tablename,$name,$host,$user,$pass) = @_;
-    my $query = "select table_name from information_schema.TABLES where table_name like '$tablename%';";
-    print("$query");
-
-    logger("INFO:START:Connect to database");
+    my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%';";
+    # print("$query");
+    
     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
 
     if ($db_connection)
     {
-        logger("INFO:Connect:Database Connection Successful");
         $db_connection->{mysql_auto_reconnect} = 1;
         $db_connection->do( "set names utf8" );
 
@@ -228,12 +226,13 @@ sub drop_table_list
         $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
         # DBI::dump_results($db_result);
 
-        # logger("INFO:Housekeeping DB TABLE:query=$query");
+        # logger("DEBUG:Housekeeping DB TABLE:query=$query");
         while(my @row = $db_result->fetchrow_array()){
-            printf("test: %s\n",$row[0]);
+            # printf("test: %s\n",$row[0],$row[1]);
             $query="DROP TABLE IF EXISTS `$row[0]`";
             my $rm_result = $db_connection->prepare($query);            
             $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+            logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
         }   
   
         $db_connection->disconnect;
@@ -244,15 +243,11 @@ sub drop_table_list
     }
 }
 
-sub drop_table_bytime
+sub drop_table_byhistory
 {
-    my(@row,$d_tablename,$name,$host,$user,$pass) = @_;
-
-
-    for(my $i = 0; $i < @row; $i++)
-    {
-    }
-
+    my($tablename,$name,$host,$user,$pass,$keep_count,$table_count) = @_;
+    $tablename.="00";
+    print("");
     
 }
 sub drop_table_bycount
