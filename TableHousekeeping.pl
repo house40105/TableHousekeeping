@@ -74,7 +74,9 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS3G_keep_value)");
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        ########
+        &drop_table_byhistory($NMOSS3G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         
         my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
@@ -245,9 +247,54 @@ sub drop_table_list
 
 sub drop_table_byhistory
 {
-    my($tablename,$name,$host,$user,$pass,$keep_count,$table_count) = @_;
-    $tablename.="00";
-    print("");
+    my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
+    my $target_tablename = $tablename."00";
+    print("tablename: $target_tablename\n");
+
+    my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
+    logger("INFO:START DROP TABLES BY TIME (Target Table: $tablename%)");
+    my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
+    if ($db_connection)
+    {
+        $db_connection->{mysql_auto_reconnect} = 1;
+        $db_connection->do( "set names utf8" );
+
+        my $db_result = $db_connection->prepare($query);            
+        $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
+
+        while(my @row = $db_result->fetchrow_array()){
+            # printf("test: %s,%s\n",$target_tablename,$row[0]);
+            # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
+            # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
+            if($target_tablename gt $row[0])
+            {
+                # print(">\n")
+                $query="DROP TABLE IF EXISTS `$row[0]`";
+                my $rm_result = $db_connection->prepare($query);            
+                $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+                logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
+                
+            }
+            else
+            {
+                # print("<\n")
+            }
+            # if()
+            # {
+            #     $query="DROP TABLE IF EXISTS `$row[0]`";
+            #     my $rm_result = $db_connection->prepare($query);            
+            #     $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+            #     logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
+            # }
+        }   
+
+
+        $db_connection->disconnect;
+    }
+    else
+    {
+        logger("INFO:Connect:Database Connection ERROR");
+    }
     
 }
 sub drop_table_bycount
