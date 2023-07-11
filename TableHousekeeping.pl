@@ -8,7 +8,9 @@
 #schedule    : 0 1 * * * (01:00/day)
 ##################################################################
 # Version 1.0 : 2023-07-10 House (house@acom-networks.com)
-
+#               - init.
+# Version 2.0 : 2023-07-11 House (house@acom-networks.com)
+#               - added drop tables by time  function
 
 use strict;
 use warnings;
@@ -17,7 +19,7 @@ use DBI;
 use POSIX qw/strftime/;
 
 ##### START: Define some global variables
-my $version = '1.0';
+my $version = '2.0';
 my $program_name = 'TableHousekeeping';
 #my $configfile = '/home/TableHousekeeping/TableHousekeeping.ini';
 my $configfile = '/home/house/project/TableHousekeeping/TableHousekeeping.ini';
