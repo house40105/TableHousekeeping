@@ -75,9 +75,18 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        
         my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         print("NMOSS3G_count: ".$NMOSS3G_count."\n");
+    }
+    if($NMOSS3G_keep_type =~ /COUNT/)
+    {
+        my $Clean_backup_tablename = $NMOSS3G_tablename;
+        logger("INFO:Housekeeping DB by Count TABLE = $Clean_backup_tablename%");
+
+        my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
+        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value,$NMOSS3G_count)
     }
     
     
@@ -100,9 +109,18 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+
         my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         print("NMOSS4G_count: ".$NMOSS4G_count."\n");
+    }
+    if($NMOSS4G_keep_type =~ /COUNT/)
+    {
+        my $Clean_backup_tablename = $NMOSS4G_tablename;
+        logger("INFO:Housekeeping DB by Count TABLE = $Clean_backup_tablename%");
+
+        my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        # print("NMOSS4G_count: ".$NMOSS4G_count."\n");
+        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value,$NMOSS4G_count)
     }
     
     
@@ -118,6 +136,7 @@ if($EnableMENU =~ /HinetIPTable/)
 
     if($HinetIPTable_keep_type =~ /DAY/)
     {
+
         $db_backup = $HinetIPTable_keep_value * 3600 * 24;
 
         my $Clean_backup_tablename = $HinetIPTable_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
@@ -128,16 +147,12 @@ if($EnableMENU =~ /HinetIPTable/)
     }
     if($HinetIPTable_keep_type =~ /COUNT/)
     {
-        my $Clean_backup_tablename = $HinetIPTable_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
-        logger("INFO:Housekeeping DB by Count TABLE=$Clean_backup_tablename%");
+        my $Clean_backup_tablename = $HinetIPTable_tablename;
+        logger("INFO:Housekeeping DB by Count TABLE = $Clean_backup_tablename%");
 
-        # &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         my $HinetIPTable_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("HinetIPTable_count: ".$HinetIPTable_count."\n");
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value,$HinetIPTable_count)
-
-        #
-
     }
 
     
@@ -246,9 +261,10 @@ sub drop_table_bycount
 
     if($keep_count < $table_count)
     {
-        my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%' order bycreate_time DESC;";
-        logger("INFO:START:Connect to database");
+        my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%' order by create_time DESC;";
+        logger("INFO:START DROP TABLES BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
         my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
+        # print("keep_count: $keep_count table_count: $table_count \n");
 
         if ($db_connection)
         {
@@ -262,13 +278,13 @@ sub drop_table_bycount
             # logger("INFO:Housekeeping DB TABLE:query=$query");
             my $tmp_count=0;
             while(my @row = $db_result->fetchrow_array()){
-                printf("test: %s,%s\n",$row[0],$row[1]);
+                # printf("test: %s,%s\n",$row[0],$row[1]);
                 if($tmp_count >= $keep_count)
                 {
                     $query="DROP TABLE IF EXISTS `$row[0]`";
                     my $rm_result = $db_connection->prepare($query);            
-                    $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr")
-                    logger("DEBUG:Delete Table:Table Name = $row[0]");
+                    $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+                    logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
                 }
                 $tmp_count++;
             }   
@@ -279,6 +295,11 @@ sub drop_table_bycount
         {
             logger("INFO:Connect:Database Connection ERROR");
         }
+    }
+    else
+    {
+        # print("nothing to do"."\n")
+        logger("INFO:Nothing To Do:The total number of $tablename% Tables <= keeping count. (Table count: $table_count, Keeping count: $keep_count)");
     }
     
 
