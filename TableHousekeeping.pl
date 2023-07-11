@@ -77,9 +77,6 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
         # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         ########
         &drop_table_byhistory($NMOSS3G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        
-        my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
     }
     if($NMOSS3G_keep_type =~ /COUNT/)
     {
@@ -110,10 +107,9 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS4G_keep_value)");
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_byhistory($NMOSS4G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
 
-        my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        print("NMOSS4G_count: ".$NMOSS4G_count."\n");
     }
     if($NMOSS4G_keep_type =~ /COUNT/)
     {
@@ -145,7 +141,8 @@ if($EnableMENU =~ /HinetIPTable/)
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $HinetIPTable_keep_value)");
 
         # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_byhistory($HinetIPTable_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($HinetIPTable_keep_type =~ /COUNT/)
     {
@@ -248,7 +245,7 @@ sub drop_table_list
 sub drop_table_byhistory
 {
     my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
-    my $target_tablename = $tablename."00";
+    my $target_tablename = $tablename."24";
     print("tablename: $target_tablename\n");
 
     my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
@@ -266,7 +263,7 @@ sub drop_table_byhistory
             # printf("test: %s,%s\n",$target_tablename,$row[0]);
             # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
             # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
-            if($target_tablename gt $row[0])
+            if($target_tablename le $row[0])
             {
                 # print(">\n")
                 $query="DROP TABLE IF EXISTS `$row[0]`";
