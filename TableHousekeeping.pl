@@ -246,7 +246,7 @@ sub drop_table_byhistory
 {
     my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
     my $target_tablename = $tablename."24";
-    print("tablename: $target_tablename\n");
+    # print("tablename: $target_tablename\n");
 
     my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
     logger("INFO:START DROP TABLES BY TIME (Target Table: $tablename%)");
@@ -260,9 +260,9 @@ sub drop_table_byhistory
         $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
 
         while(my @row = $db_result->fetchrow_array()){
-            printf("test: %s,%s\n",$target_tablename,$row[0]);
-            printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
-            printf("score: %f\n",ord($target_tablename)-ord($row[0]));
+            # printf("test: %s,%s\n",$target_tablename,$row[0]);
+            # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
+            # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
             if($target_tablename ge $row[0])
             {
                 # print(">\n")
@@ -274,7 +274,7 @@ sub drop_table_byhistory
             }
             else
             {
-                print("<\n")
+                # print("<\n")
             }
             # if()
             # {
@@ -428,7 +428,8 @@ sub fill_ini (\$){
 #in  :    string
 #out :    n/a
 #work:    logging
-sub logger {
+sub logger 
+{
 
     my @log_array = @_;
     my $log_line = $log_array[0];
