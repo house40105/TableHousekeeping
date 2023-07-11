@@ -260,11 +260,17 @@ sub drop_table_bycount
             $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
 
             # logger("INFO:Housekeeping DB TABLE:query=$query");
+            my $tmp_count=0;
             while(my @row = $db_result->fetchrow_array()){
                 printf("test: %s,%s\n",$row[0],$row[1]);
-                # $query="DROP TABLE IF EXISTS `$row[0]`";
-                my $rm_result = $db_connection->prepare($query);            
-                $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+                if($tmp_count >= $keep_count)
+                {
+                    $query="DROP TABLE IF EXISTS `$row[0]`";
+                    my $rm_result = $db_connection->prepare($query);            
+                    $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr")
+                    logger("DEBUG:Delete Table:Table Name = $row[0]");
+                    $tmp_count++;
+                }
             }   
     
             $db_connection->disconnect;
