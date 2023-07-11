@@ -265,7 +265,7 @@ sub drop_table_byhistory
             # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
             if($target_tablename ge $row[0])
             {
-                # print(">\n")
+                # print(">\n");
                 $query="DROP TABLE IF EXISTS `$row[0]`";
                 my $rm_result = $db_connection->prepare($query);            
                 $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
