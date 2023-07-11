@@ -260,10 +260,10 @@ sub drop_table_byhistory
         $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
 
         while(my @row = $db_result->fetchrow_array()){
-            # printf("test: %s,%s\n",$target_tablename,$row[0]);
-            # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
-            # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
-            if($target_tablename le $row[0])
+            printf("test: %s,%s\n",$target_tablename,$row[0]);
+            printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
+            printf("score: %f\n",ord($target_tablename)-ord($row[0]));
+            if($target_tablename ge $row[0])
             {
                 # print(">\n")
                 $query="DROP TABLE IF EXISTS `$row[0]`";
@@ -274,7 +274,7 @@ sub drop_table_byhistory
             }
             else
             {
-                # print("<\n")
+                print("<\n")
             }
             # if()
             # {
