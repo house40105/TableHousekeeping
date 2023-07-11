@@ -269,8 +269,8 @@ sub drop_table_bycount
                     my $rm_result = $db_connection->prepare($query);            
                     $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr")
                     logger("DEBUG:Delete Table:Table Name = $row[0]");
-                    $tmp_count++;
                 }
+                $tmp_count++;
             }   
     
             $db_connection->disconnect;
