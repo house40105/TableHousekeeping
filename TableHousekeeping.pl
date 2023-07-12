@@ -89,7 +89,8 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
 
         my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
-        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value,$NMOSS3G_count)
+        # &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value,$NMOSS3G_count);
+        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value);
     }
     
     
@@ -124,7 +125,8 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
 
         my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("NMOSS4G_count: ".$NMOSS4G_count."\n");
-        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value,$NMOSS4G_count)
+        # &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value,$NMOSS4G_count);
+        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value);
     }
     
     
@@ -159,7 +161,8 @@ if($EnableMENU =~ /HinetIPTable/)
 
         my $HinetIPTable_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("HinetIPTable_count: ".$HinetIPTable_count."\n");
-        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value,$HinetIPTable_count)
+        # &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value,$HinetIPTable_count);
+        &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value);
     }
 
     
@@ -321,11 +324,12 @@ sub drop_table_byhistory
 }
 sub drop_table_bycount
 {
-    my($tablename,$name,$host,$user,$pass,$keep_count,$table_count) = @_;
+    my($tablename,$name,$host,$user,$pass,$keep_count) = @_;
+    my $table_count = &get_count($tablename,$name,$host,$user,$pass);
 
     if($keep_count < $table_count)
     {
-        my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%' order by create_time DESC;";
+        my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%' order by table_name DESC;";
         logger("INFO:START DROP TABLES BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
         my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
         # print("keep_count: $keep_count table_count: $table_count \n");
