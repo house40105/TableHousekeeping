@@ -66,6 +66,8 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
     my $NMOSS3G_tablename = $cfg{'NMOSS4VoWiFi_3G'}->{'TableName'};
     my $NMOSS3G_keep_type = $cfg{'NMOSS4VoWiFi_3G'}->{'Keep_Type'};
     my $NMOSS3G_keep_value = $cfg{'NMOSS4VoWiFi_3G'}->{'Keep_Value'};
+    $NMOSS3G_keep_value = &keep_value_check($NMOSS3G_tablename,$NMOSS3G_keep_value);
+
     my $db_backup;
     # print('NMOSS4VoWiFi_3G'.'\n');
     if($NMOSS3G_keep_type =~ /DAY/)
@@ -83,7 +85,7 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
     if($NMOSS3G_keep_type =~ /COUNT/)
     {
         my $Clean_backup_tablename = $NMOSS3G_tablename;
-        logger("INFO:Housekeeping DB by Count TABLE = $Clean_backup_tablename%");
+        logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $NMOSS3G_keep_value)");
 
         my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
@@ -99,6 +101,8 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
     my $NMOSS4G_tablename = $cfg{'NMOSS4VoWiFi_4G'}->{'TableName'};
     my $NMOSS4G_keep_type = $cfg{'NMOSS4VoWiFi_4G'}->{'Keep_Type'};
     my $NMOSS4G_keep_value = $cfg{'NMOSS4VoWiFi_4G'}->{'Keep_Value'};
+    $NMOSS4G_keep_value = &keep_value_check($NMOSS4G_tablename,$NMOSS4G_keep_value);
+    
     my $db_backup;
 
     if($NMOSS4G_keep_type =~ /DAY/)
@@ -116,7 +120,7 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
     if($NMOSS4G_keep_type =~ /COUNT/)
     {
         my $Clean_backup_tablename = $NMOSS4G_tablename;
-        logger("INFO:Housekeeping DB by Count TABLE = $Clean_backup_tablename%");
+        logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $NMOSS4G_keep_value)");
 
         my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("NMOSS4G_count: ".$NMOSS4G_count."\n");
@@ -132,6 +136,8 @@ if($EnableMENU =~ /HinetIPTable/)
     my $HinetIPTable_tablename = $cfg{'HinetIPTable'}->{'TableName'};
     my $HinetIPTable_keep_type = $cfg{'HinetIPTable'}->{'Keep_Type'};
     my $HinetIPTable_keep_value = $cfg{'HinetIPTable'}->{'Keep_Value'};
+    $HinetIPTable_keep_value = &keep_value_check($HinetIPTable_tablename,$HinetIPTable_keep_value);
+
     my $db_backup;
 
     if($HinetIPTable_keep_type =~ /DAY/)
@@ -149,7 +155,7 @@ if($EnableMENU =~ /HinetIPTable/)
     if($HinetIPTable_keep_type =~ /COUNT/)
     {
         my $Clean_backup_tablename = $HinetIPTable_tablename;
-        logger("INFO:Housekeeping DB by Count TABLE = $Clean_backup_tablename%");
+        logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $HinetIPTable_keep_value)");
 
         my $HinetIPTable_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
         # print("HinetIPTable_count: ".$HinetIPTable_count."\n");
@@ -177,7 +183,31 @@ if($EnableMENU =~ /HinetIPTable/)
 exit();
 #######
 
+sub keep_value_check
+{
+    my ($t_name,$k_value) = @_;
+    my $keep_value_default = 1;
 
+    chomp($k_value);
+    if( $k_value =~ /^\d+$/ )
+    { 
+        if($k_value == 0)
+        {
+            &logger("WARNING:Keep Value of $t_name is not positive integer (Automatically converting to default values $keep_value_default)");
+            return $keep_value_default;   
+        }
+        else
+        {
+            # &logger("DEBUG:Cardinal Number(k_value = $k_value)");
+            return $k_value;
+        }
+    }
+    else
+    { 
+        &logger("WARNING:Keep Value of $t_name is not positive integer (Automatically converting to default values $keep_value_default)");
+        return $keep_value_default;
+    }
+}
 
 sub drop_table
 {
@@ -251,7 +281,7 @@ sub drop_table_byhistory
     # print("tablename: $target_tablename\n");
 
     my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
-    logger("INFO:START DROP TABLES BY TIME (Target Table: $tablename%)");
+    logger("INFO:START DROP TABLES (Target Table: $tablename%)");
     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
     if ($db_connection)
     {
@@ -278,13 +308,6 @@ sub drop_table_byhistory
             {
                 # print("<\n")
             }
-            # if()
-            # {
-            #     $query="DROP TABLE IF EXISTS `$row[0]`";
-            #     my $rm_result = $db_connection->prepare($query);            
-            #     $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
-            #     logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
-            # }
         }   
 
 
