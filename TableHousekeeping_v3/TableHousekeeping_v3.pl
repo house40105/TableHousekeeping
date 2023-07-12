@@ -81,7 +81,7 @@ while (my ($k, $v) = each %cfg) {
             my $tablename = $p_tablename;
             my $keep_type = $p_keep_type;
             my $keep_value = $p_keep_value;
-            print "---------------\n Start:  tablename = $p_tablename; keep_type = $p_keep_type; keep_value = $p_keep_value;\n";
+            # print "---------------\n Start:  tablename = $p_tablename; keep_type = $p_keep_type; keep_value = $p_keep_value;\n";
 
             $p_keep_value = &keep_value_check($tablename,$p_keep_value);
 
@@ -102,21 +102,14 @@ while (my ($k, $v) = each %cfg) {
 
                 &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$p_keep_value);
             }
- 
-
         }
         else
         {
             # print " NO \n";
             &logger("ERROR:Keep type or keep value of [$p_tablename] not found on config file");
         }
-        
     }
-   print("\n");
 }
-print("\n\n");
-
-
 
 #######
 # $db_connection->disconnect;
