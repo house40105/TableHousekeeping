@@ -11,6 +11,8 @@
 #               - init.
 # Version 2.0 : 2023-07-11 House (house@acom-networks.com)
 #               - added drop tables by time  function
+# Version 2.1 : 2023-07-12 House (house@acom-networks.com)
+#               - enhancing the performance of MySQL
 
 use strict;
 use warnings;
@@ -77,14 +79,12 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
         my $Clean_backup_tablename = $NMOSS3G_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS3G_keep_value)");
 
-
-        &drop_table_byhistory($NMOSS3G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_byday($NMOSS3G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($NMOSS3G_keep_type =~ /COUNT/)
     {
         my $Clean_backup_tablename = $NMOSS3G_tablename;
         logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $NMOSS3G_keep_value)");
-
 
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value);
     }
@@ -109,15 +109,12 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
         my $Clean_backup_tablename = $NMOSS4G_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS4G_keep_value)");
 
-
-        &drop_table_byhistory($NMOSS4G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-
+        &drop_table_byday($NMOSS4G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($NMOSS4G_keep_type =~ /COUNT/)
     {
         my $Clean_backup_tablename = $NMOSS4G_tablename;
         logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $NMOSS4G_keep_value)");
-
 
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value);
     }
@@ -143,14 +140,12 @@ if($EnableMENU =~ /HinetIPTable/)
         my $Clean_backup_tablename = $HinetIPTable_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $HinetIPTable_keep_value)");
 
-
-        &drop_table_byhistory($HinetIPTable_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+        &drop_table_byday($HinetIPTable_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($HinetIPTable_keep_type =~ /COUNT/)
     {
         my $Clean_backup_tablename = $HinetIPTable_tablename;
         logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $HinetIPTable_keep_value)");
-
 
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value);
     }
@@ -298,6 +293,47 @@ sub drop_table_byhistory
     }
     
 }
+
+sub drop_table_byday
+{
+    my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
+    my $target_tablename = $tablename."24";
+    # print("tablename: $target_tablename\n");
+
+    my $query = "select table_name from information_schema.TABLES where table_name like '$title_tablename%' and table_name <= '$target_tablename' order by table_name;";
+    logger("INFO:START DROP TABLES (Target Table: $tablename%)");
+    my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
+    if ($db_connection)
+    {
+        $db_connection->{mysql_auto_reconnect} = 1;
+        $db_connection->do( "set names utf8" );
+
+        my $db_result = $db_connection->prepare($query);            
+        $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
+
+        while(my @row = $db_result->fetchrow_array()){
+            # printf("test: %s,%s\n",$target_tablename,$row[0]);
+            # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
+            # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
+
+            $query="DROP TABLE IF EXISTS `$row[0]`";
+            my $rm_result = $db_connection->prepare($query);            
+            $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+            logger("DEBUG:Delete Table:Table Name = $row[0]");
+                
+
+        }   
+
+
+        $db_connection->disconnect;
+    }
+    else
+    {
+        logger("INFO:Connect:Database Connection ERROR");
+    }
+    
+}
+
 sub drop_table_bycount
 {
     my($tablename,$name,$host,$user,$pass,$keep_count) = @_;
@@ -305,7 +341,10 @@ sub drop_table_bycount
 
     if($keep_count < $table_count)
     {
-        my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%' order by table_name DESC;";
+        my $offset_tmp = $table_count-$keep_count;
+        print("offset_tmp: $offset_tmp");
+
+        my $query = "select table_name from information_schema.TABLES where table_name like '$tablename%' order by table_name limit $offset_tmp;";
         logger("INFO:START DROP TABLES BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
         my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
         # print("keep_count: $keep_count table_count: $table_count \n");
@@ -323,16 +362,11 @@ sub drop_table_bycount
             my $tmp_count=0;
             while(my @row = $db_result->fetchrow_array()){
                 # printf("test: %s,%s\n",$row[0],$row[1]);
-                if($tmp_count >= $keep_count)
-                {
-                    $query="DROP TABLE IF EXISTS `$row[0]`";
-                    my $rm_result = $db_connection->prepare($query);            
-                    $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
-                    logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
-                }
-                $tmp_count++;
+                $query="DROP TABLE IF EXISTS `$row[0]`";
+                my $rm_result = $db_connection->prepare($query);      
+                $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+                logger("DEBUG:Delete Table:Table Name = $row[0]");
             }   
-    
             $db_connection->disconnect;
         }
         else
