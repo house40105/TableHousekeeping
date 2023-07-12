@@ -248,51 +248,51 @@ sub keep_value_check
 #     }
 # }
 
-sub drop_table_byhistory
-{
-    my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
-    my $target_tablename = $tablename."24";
-    # print("tablename: $target_tablename\n");
+# sub drop_table_byhistory
+# {
+#     my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
+#     my $target_tablename = $tablename."24";
+#     # print("tablename: $target_tablename\n");
 
-    my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
-    logger("INFO:START DROP TABLES (Target Table: $tablename%)");
-    my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
-    if ($db_connection)
-    {
-        $db_connection->{mysql_auto_reconnect} = 1;
-        $db_connection->do( "set names utf8" );
+#     my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
+#     logger("INFO:START DROP TABLES (Target Table: $tablename%)");
+#     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
+#     if ($db_connection)
+#     {
+#         $db_connection->{mysql_auto_reconnect} = 1;
+#         $db_connection->do( "set names utf8" );
 
-        my $db_result = $db_connection->prepare($query);            
-        $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
+#         my $db_result = $db_connection->prepare($query);            
+#         $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
 
-        while(my @row = $db_result->fetchrow_array()){
-            # printf("test: %s,%s\n",$target_tablename,$row[0]);
-            # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
-            # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
-            if($target_tablename ge $row[0])
-            {
-                # print(">\n");
-                $query="DROP TABLE IF EXISTS `$row[0]`";
-                my $rm_result = $db_connection->prepare($query);            
-                $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
-                logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
+#         while(my @row = $db_result->fetchrow_array()){
+#             # printf("test: %s,%s\n",$target_tablename,$row[0]);
+#             # printf("score: %f %f\n",ord($target_tablename),ord($row[0]));
+#             # printf("score: %f\n",ord($target_tablename)-ord($row[0]));
+#             if($target_tablename ge $row[0])
+#             {
+#                 # print(">\n");
+#                 $query="DROP TABLE IF EXISTS `$row[0]`";
+#                 my $rm_result = $db_connection->prepare($query);            
+#                 $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+#                 logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
                 
-            }
-            else
-            {
-                # print("<\n")
-            }
-        }   
+#             }
+#             else
+#             {
+#                 # print("<\n")
+#             }
+#         }   
 
 
-        $db_connection->disconnect;
-    }
-    else
-    {
-        logger("INFO:Connect:Database Connection ERROR");
-    }
+#         $db_connection->disconnect;
+#     }
+#     else
+#     {
+#         logger("INFO:Connect:Database Connection ERROR");
+#     }
     
-}
+# }
 
 sub drop_table_byday
 {
