@@ -69,14 +69,14 @@ while (my ($k, $v) = each %cfg) {
     else
     {
         my $p_tablename = $k;
-        my $p_keep_type = $cfg{$k}->{'Keep_Type'};
-        my $p_keep_value = $cfg{$k}->{'Keep_Value'};
+        my $p_keep_type = '0';
+        my $p_keep_value = '0';
+        $p_keep_type = $cfg{$k}->{'Keep_Type'};
+        $p_keep_value = $cfg{$k}->{'Keep_Value'};
         # print "tablename= $p_tablename \n";
 
-        if($p_keep_type and $p_keep_value)
+        if(($p_keep_type and $p_keep_value) or ($p_keep_type and $p_keep_value eq 0))
         {
-            # print " YES \n";
-
             #### Databases housekeeping
             my $tablename = $p_tablename;
             my $keep_type = $p_keep_type;
