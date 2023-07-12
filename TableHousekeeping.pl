@@ -77,9 +77,7 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
         my $Clean_backup_tablename = $NMOSS3G_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS3G_keep_value)");
 
-        # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        ########
+
         &drop_table_byhistory($NMOSS3G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($NMOSS3G_keep_type =~ /COUNT/)
@@ -87,9 +85,7 @@ if($EnableMENU =~ /NMOSS4VoWiFi_3G/)
         my $Clean_backup_tablename = $NMOSS3G_tablename;
         logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $NMOSS3G_keep_value)");
 
-        my $NMOSS3G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # print("NMOSS3G_count: ".$NMOSS3G_count."\n");
-        # &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value,$NMOSS3G_count);
+
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS3G_keep_value);
     }
     
@@ -113,8 +109,7 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
         my $Clean_backup_tablename = $NMOSS4G_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $NMOSS4G_keep_value)");
 
-        # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+
         &drop_table_byhistory($NMOSS4G_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
 
     }
@@ -123,9 +118,7 @@ if($EnableMENU =~ /NMOSS4VoWiFi_4G/)
         my $Clean_backup_tablename = $NMOSS4G_tablename;
         logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $NMOSS4G_keep_value)");
 
-        my $NMOSS4G_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # print("NMOSS4G_count: ".$NMOSS4G_count."\n");
-        # &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value,$NMOSS4G_count);
+
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$NMOSS4G_keep_value);
     }
     
@@ -150,8 +143,7 @@ if($EnableMENU =~ /HinetIPTable/)
         my $Clean_backup_tablename = $HinetIPTable_tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
         logger("INFO:START DROP TABLES BY DAY (Keeping Day: $HinetIPTable_keep_value)");
 
-        # &drop_table($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # &drop_table_list($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
+
         &drop_table_byhistory($HinetIPTable_tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
     }
     if($HinetIPTable_keep_type =~ /COUNT/)
@@ -159,28 +151,12 @@ if($EnableMENU =~ /HinetIPTable/)
         my $Clean_backup_tablename = $HinetIPTable_tablename;
         logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $HinetIPTable_keep_value)");
 
-        my $HinetIPTable_count = &get_count($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
-        # print("HinetIPTable_count: ".$HinetIPTable_count."\n");
-        # &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value,$HinetIPTable_count);
+
         &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$HinetIPTable_keep_value);
     }
 
     
 }
-
-
-
-# my $Clean_NMOSS4G_backup_tablename = 'NMOSS4VoWiFi_4G_BK' . strftime('%Y%m%d%H', localtime(time()-$db_backup_month));
-# my $Clean_NMOSS3G_backup_tablename = 'NMOSS4VoWiFi_3G_BK' . strftime('%Y%m%d%H', localtime(time()-$db_backup_month));
-# logger("INFO:Housekeeping DB TABLE $Clean_NMOSS4G_backup_tablename");
-# my $drop_4g_backup_query = "DROP TABLE IF EXISTS $Clean_NMOSS4G_backup_tablename";
-# $db_result = $db_connection->prepare($drop_4g_backup_query);
-# $db_result->execute or logger("ERROR:DROP TABLE $Clean_NMOSS4G_backup_tablename :$DBI::errstr");
-# logger("INFO:Housekeeping DB TABLE $Clean_NMOSS3G_backup_tablename");
-# my $drop_3g_backup_query = "DROP TABLE IF EXISTS $Clean_NMOSS3G_backup_tablename";
-# $db_result = $db_connection->prepare($drop_3g_backup_query);
-# $db_result->execute or logger("ERROR:DROP TABLE $Clean_NMOSS3G_backup_tablename :$DBI::errstr");
-
 #######
 # $db_connection->disconnect;
 exit();
@@ -212,70 +188,70 @@ sub keep_value_check
     }
 }
 
-sub drop_table
-{
-    my($tablename,$name,$host,$user,$pass) = @_;
-    my $query = "DROP TABLE IF EXISTS `$tablename`;";
+# sub drop_table
+# {
+#     my($tablename,$name,$host,$user,$pass) = @_;
+#     my $query = "DROP TABLE IF EXISTS `$tablename`;";
 
-    ## connect to database
-    logger("INFO:START:Connect to database");
-    my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
-    if ($db_connection)
-    {
-        logger("INFO:Connect:Database Connection Successful");
-        $db_connection->{mysql_auto_reconnect} = 1;
-        $db_connection->do( "set names utf8" );
+#     ## connect to database
+#     logger("INFO:START:Connect to database");
+#     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
+#     if ($db_connection)
+#     {
+#         logger("INFO:Connect:Database Connection Successful");
+#         $db_connection->{mysql_auto_reconnect} = 1;
+#         $db_connection->do( "set names utf8" );
 
-        for(my $i=0; $i <= 24; $i++)
-        {
-            $query="DROP TABLE IF EXISTS `$tablename".sprintf("%02d",$i)."`";
-            my $db_result = $db_connection->prepare($query);            
-            $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
+#         for(my $i=0; $i <= 24; $i++)
+#         {
+#             $query="DROP TABLE IF EXISTS `$tablename".sprintf("%02d",$i)."`";
+#             my $db_result = $db_connection->prepare($query);            
+#             $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
 
-            # logger("INFO:Housekeeping DB TABLE:query=$query");
-        }   
-        $db_connection->disconnect;
-    }
-    else
-    {
-        logger("INFO:Connect:Database Connection ERROR");
-    }
-}
+#             # logger("INFO:Housekeeping DB TABLE:query=$query");
+#         }   
+#         $db_connection->disconnect;
+#     }
+#     else
+#     {
+#         logger("INFO:Connect:Database Connection ERROR");
+#     }
+# }
 
 
-sub drop_table_list
-{
-    my($tablename,$name,$host,$user,$pass) = @_;
-    my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%';";
-    # print("$query");
+# sub drop_table_list
+# {
+#     my($tablename,$name,$host,$user,$pass) = @_;
+#     my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$tablename%';";
+#     # print("$query");
     
-    my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
+#     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
 
-    if ($db_connection)
-    {
-        $db_connection->{mysql_auto_reconnect} = 1;
-        $db_connection->do( "set names utf8" );
+#     if ($db_connection)
+#     {
+#         $db_connection->{mysql_auto_reconnect} = 1;
+#         $db_connection->do( "set names utf8" );
 
-        my $db_result = $db_connection->prepare($query);            
-        $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
-        # DBI::dump_results($db_result);
+#         my $db_result = $db_connection->prepare($query);            
+#         $db_result->execute or logger("ERROR:DROP TABLE $tablename :$DBI::errstr");
+#         # DBI::dump_results($db_result);
 
-        # logger("DEBUG:Housekeeping DB TABLE:query=$query");
-        while(my @row = $db_result->fetchrow_array()){
-            # printf("test: %s\n",$row[0],$row[1]);
-            $query="DROP TABLE IF EXISTS `$row[0]`";
-            my $rm_result = $db_connection->prepare($query);            
-            $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
-            logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
-        }   
+#         # logger("DEBUG:Housekeeping DB TABLE:query=$query");
+#         while(my @row = $db_result->fetchrow_array()){
+#             # printf("test: %s\n",$row[0],$row[1]);
+#             $query="DROP TABLE IF EXISTS `$row[0]`";
+#             my $rm_result = $db_connection->prepare($query);            
+#             $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
+#             logger("DEBUG:Delete Table:Table Name = $row[0], Creat Time = $row[1]");
+#         }   
   
-        $db_connection->disconnect;
-    }
-    else
-    {
-        logger("INFO:Connect:Database Connection ERROR");
-    }
-}
+#         $db_connection->disconnect;
+#     }
+#     else
+#     {
+#         logger("INFO:Connect:Database Connection ERROR");
+#     }
+# }
 
 sub drop_table_byhistory
 {
