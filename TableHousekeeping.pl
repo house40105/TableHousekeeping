@@ -27,9 +27,9 @@ use POSIX qw/strftime/;
 ##### START: Define some global variables
 my $version = '3.0';
 my $program_name = 'TableHousekeeping';
-# my $configfile = '/home/TableHousekeeping/TableHousekeeping.ini';
+my $configfile = '/home/TableHousekeeping/TableHousekeeping.ini';
 # my $configfile = '/home/house/project/TableHousekeeping/TableHousekeeping.ini';
-my $configfile = '/home/house/project/TableHousekeeping/TableHousekeeping_v3.ini';
+# my $configfile = '/home/house/project/TableHousekeeping/TableHousekeeping_v3.ini';
 my %cfg;
 
 ##### START: Bring in Configuration Parameters from INI file
