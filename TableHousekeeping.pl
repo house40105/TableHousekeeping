@@ -21,7 +21,7 @@ use DBI;
 use POSIX qw/strftime/;
 
 ##### START: Define some global variables
-my $version = '2.0';
+my $version = '2.1';
 my $program_name = 'TableHousekeeping';
 #my $configfile = '/home/TableHousekeeping/TableHousekeeping.ini';
 my $configfile = '/home/house/project/TableHousekeeping/TableHousekeeping.ini';
@@ -342,7 +342,7 @@ sub drop_table_bycount
     if($keep_count < $table_count)
     {
         my $offset_tmp = $table_count-$keep_count;
-        print("offset_tmp: $offset_tmp");
+        # print("offset_tmp: $offset_tmp");
 
         my $query = "select table_name from information_schema.TABLES where table_name like '$tablename%' order by table_name limit $offset_tmp;";
         logger("INFO:START DROP TABLES BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
