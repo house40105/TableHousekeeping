@@ -95,14 +95,15 @@ while (my ($k, $v) = each %cfg) {
                 $db_backup = $p_keep_value * 3600 * 24;
 
                 my $Clean_backup_tablename = $tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
-                &logger("INFO:START DROP TABLES BY DAY (Keeping Day: $p_keep_value)");
+                # &logger("INFO:START DROP TABLES BY DAY ()");
+                &logger("INFO:START DROP TABLES [$tablename] BY DAY (Target Table Time: $Clean_backup_tablename%, Keeping Day: $p_keep_value)");
 
                 &drop_table_byday($tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
             }
             elsif($p_keep_type =~ /COUNT/)
             {
                 my $Clean_backup_tablename = $tablename;
-                &logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $p_keep_value)");
+                # &logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $p_keep_value)");
 
                 &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$p_keep_value);
             }
@@ -134,7 +135,7 @@ sub keep_value_check
     { 
         if($k_value == 0)
         {
-            &logger("WARNING:Keep Value of $t_name is not positive integer (Automatically converting to default values $keep_value_default)");
+            &logger("WARNING:Keep Value of [$t_name] is not positive integer (Automatically converting to default values $keep_value_default)");
             return $keep_value_default;   
         }
         else
@@ -145,7 +146,7 @@ sub keep_value_check
     }
     else
     { 
-        &logger("WARNING:Keep Value of $t_name is not positive integer (Automatically converting to default values $keep_value_default)");
+        &logger("WARNING:Keep Value of [$t_name] is not positive integer (Automatically converting to default values $keep_value_default)");
         return $keep_value_default;
     }
 }
@@ -159,7 +160,9 @@ sub drop_table_byday
 
     # my $query = "select table_name, create_time from information_schema.TABLES where table_name like 'NMOSS4VoWiFi_4G_BK%' and DATE(create_time) <= CURDATE() order by create_time;";
     my $query = "select table_name from information_schema.TABLES where table_name like '$title_tablename%' and table_name <= '$target_tablename' order by table_name;";
-    logger("INFO:START DROP TABLES (Target Table: $tablename%)");
+    &logger("DEBUG:Quary (Drop by day):$query");
+
+    # &logger("INFO:START DROP TABLES (Target Table: $tablename%)");
     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
     if ($db_connection)
     {
@@ -177,7 +180,7 @@ sub drop_table_byday
             $query="DROP TABLE IF EXISTS `$row[0]`";
             my $rm_result = $db_connection->prepare($query);            
             $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
-            logger("DEBUG:Delete Table:Table Name = $row[0]");
+            &logger("DEBUG:Delete Table:Table Name = $row[0]");
                 
 
         }   
@@ -187,7 +190,7 @@ sub drop_table_byday
     }
     else
     {
-        logger("INFO:Connect:Database Connection ERROR");
+        &logger("INFO:Connect:Database Connection ERROR");
     }
     
 }
@@ -203,7 +206,9 @@ sub drop_table_bycount
         # print("offset_tmp: $offset_tmp");
 
         my $query = "select table_name from information_schema.TABLES where table_name like '$tablename%' order by table_name limit $offset_tmp;";
-        logger("INFO:START DROP TABLES BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
+        &logger("DEBUG:Quary (Drop by count):$query");
+
+        &logger("INFO:START DROP TABLES [$tablename] BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
         my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
         # print("keep_count: $keep_count table_count: $table_count \n");
 
@@ -223,19 +228,19 @@ sub drop_table_bycount
                 $query="DROP TABLE IF EXISTS `$row[0]`";
                 my $rm_result = $db_connection->prepare($query);      
                 $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
-                logger("DEBUG:Delete Table:Table Name = $row[0]");
+                &logger("DEBUG:Delete Table:Table Name = $row[0]");
             }   
             $db_connection->disconnect;
         }
         else
         {
-            logger("INFO:Connect:Database Connection ERROR");
+            &logger("INFO:Connect:Database Connection ERROR");
         }
     }
     else
     {
         # print("nothing to do"."\n")
-        logger("INFO:Nothing To Do:The total number of $tablename% Tables <= keeping count. (Table count: $table_count, Keeping count: $keep_count)");
+        &logger("INFO:Nothing To Do:The total number of [$tablename%] Tables NOT more than keeping count. (Table count: $table_count, Keeping count: $keep_count)");
     }
     
 
