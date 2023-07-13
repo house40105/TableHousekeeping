@@ -93,20 +93,20 @@ while (my ($k, $v) = each %cfg) {
                 $db_backup = $p_keep_value * 3600 * 24;
 
                 my $Clean_backup_tablename = $tablename . strftime('%Y%m%d', localtime(time()-$db_backup));
-                logger("INFO:START DROP TABLES BY DAY (Keeping Day: $p_keep_value)");
+                &logger("INFO:START DROP TABLES BY DAY (Keeping Day: $p_keep_value)");
 
                 &drop_table_byday($tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
             }
             elsif($p_keep_type =~ /COUNT/)
             {
                 my $Clean_backup_tablename = $tablename;
-                logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $p_keep_value)");
+                &logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $p_keep_value)");
 
                 &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$p_keep_value);
             }
             else
             {
-                logger("ERROR:Keep type of [$p_tablename] not correct on config file");
+                &logger("ERROR:Keep type of [$p_tablename] not correct on config file");
             }
         }
         else
@@ -196,7 +196,7 @@ sub drop_table_bycount
     if($keep_count < $table_count)
     {
         my $offset_tmp = $table_count-$keep_count;
-        print("offset_tmp: $offset_tmp");
+        # print("offset_tmp: $offset_tmp");
 
         my $query = "select table_name from information_schema.TABLES where table_name like '$tablename%' order by table_name limit $offset_tmp;";
         logger("INFO:START DROP TABLES BY COUNT (Table count: $table_count, Keeping count: $keep_count)");
