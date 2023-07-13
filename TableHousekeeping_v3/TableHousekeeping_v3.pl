@@ -152,8 +152,10 @@ sub drop_table_byday
 {
     my($title_tablename,$tablename,$name,$host,$user,$pass) = @_;
     my $target_tablename = $tablename."24";
+    my $target_time = $tablename."24";
     # print("tablename: $target_tablename\n");
 
+    # my $query = "select table_name, create_time from information_schema.TABLES where table_name like 'NMOSS4VoWiFi_4G_BK%' and DATE(create_time) <= CURDATE() order by create_time;";
     my $query = "select table_name from information_schema.TABLES where table_name like '$title_tablename%' and table_name <= '$target_tablename' order by table_name;";
     logger("INFO:START DROP TABLES (Target Table: $tablename%)");
     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
