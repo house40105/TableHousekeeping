@@ -69,18 +69,20 @@ while (my ($k, $v) = each %cfg) {
     else
     {
         my $p_tablename = $k;
-        my $p_keep_type = '0';
-        my $p_keep_value = '0';
-        $p_keep_type = $cfg{$k}->{'Keep_Type'};
-        $p_keep_value = $cfg{$k}->{'Keep_Value'};
-        # print "tablename= $p_tablename \n";
+        my $p_keep_type = $cfg{$k}->{'Keep_Type'};
+        my $p_keep_value = $cfg{$k}->{'Keep_Value'};
+        $p_keep_type = '' if($cfg{$k}->{'Keep_Type'} =~ /^\s*$/);
+        $p_keep_value = '' if($cfg{$k}->{'Keep_Value'} =~ /^\s*$/);
 
-        if(($p_keep_type and $p_keep_value) or ($p_keep_type and $p_keep_value eq 0))
+################################################################################################################################################
+        # print "p_keep_type= $p_keep_type,p_keep_value= $p_keep_value\n";
+
+        if(($p_keep_type !~ /^\s*$/) and ($p_keep_value !~ /^\s*$/))
         {
             #### Databases housekeeping
-            my $tablename = $p_tablename;
-            my $keep_type = $p_keep_type;
-            my $keep_value = $p_keep_value;
+			my $tablename = $p_tablename;
+			# my $keep_type = $p_keep_type;
+			# my $keep_value = $p_keep_value;
             # print "---------------\n Start:  tablename = $p_tablename; keep_type = $p_keep_type; keep_value = $p_keep_value;\n";
 
             $p_keep_value = &keep_value_check($tablename,$p_keep_value);
@@ -95,12 +97,16 @@ while (my ($k, $v) = each %cfg) {
 
                 &drop_table_byday($tablename,$Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass);
             }
-            if($p_keep_type =~ /COUNT/)
+            elsif($p_keep_type =~ /COUNT/)
             {
                 my $Clean_backup_tablename = $tablename;
                 logger("INFO:START DROP TABLES BY COUNT (Keeping Count: $p_keep_value)");
 
                 &drop_table_bycount($Clean_backup_tablename,$db_name,$db_host,$db_user,$db_pass,$p_keep_value);
+            }
+            else
+            {
+                logger("ERROR:Keep type of [$p_tablename] not correct on config file");
             }
         }
         else
