@@ -31,7 +31,7 @@ sh install.sh
  
 
 >注意事項  
->* 上線前記得確認`TableHousekeeping.ini`的 log_dir路徑是否正確 (路徑: /home/logs/TableHousekeeping/)
+>* 上版前記得確認`TableHousekeeping.ini`的 log_dir路徑是否正確 (路徑: /home/logs/TableHousekeeping/)
 >* 以及 `TableHousekeeping.pl`的 configfile路徑 (路徑: /home/TableHousekeeping/TableHousekeeping.ini)
 >* 依自行的需求來設定或增減`TableHousekeeping.ini`裡的sections  
 >  標準section設定範例:
