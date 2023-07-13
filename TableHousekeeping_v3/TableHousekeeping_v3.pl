@@ -7,6 +7,8 @@
 #trigger     : cronjob
 #schedule    : 0 1 * * * (01:00/day)
 ##################################################################
+# Version 0.0 : 2017-12-30 CharlesHo (charles@acom-networks.com)
+#
 # Version 1.0 : 2023-07-10 House (house@acom-networks.com)
 #               - init.
 # Version 2.0 : 2023-07-11 House (house@acom-networks.com)
