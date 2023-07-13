@@ -4,7 +4,7 @@
 ---
 #### 0. Project
 
-Get the code from[https://github.com/house40105/TableHousekeeping](https://github.com/house40105/TableHousekeeping) and upload it to the target host in `/tmp` directory for installation.
+Get the code from [https://github.com/house40105/TableHousekeeping](https://github.com/house40105/TableHousekeeping) and upload it to the target host in `/tmp` directory for installation.
 
 ```
 # The following steps, with the default path set to
