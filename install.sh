@@ -7,7 +7,7 @@ mkdir -p /home/logs/TableHousekeeping/
 mkdir -p /home/TableHousekeeping/
 
 # 複製到指定目錄
-cp /tmp/TableHousekeeping/* /home/TableHousekeeping/
+cp /tmp/TableHousekeeping/TableHousekeeping-main /home/TableHousekeeping/
 chmod 754 /home/TableHousekeeping/TableHousekeeping.pl
 
 # 自動設定到Crontab (判斷是否crontab已有)
