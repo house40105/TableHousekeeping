@@ -300,6 +300,7 @@ sub drop_table_byday
     my $target_tablename = $tablename."24";
     # print("tablename: $target_tablename\n");
 
+    # my $query = "select table_name, create_time from information_schema.TABLES where table_name like '$title_tablename%' order by create_time DESC;";
     my $query = "select table_name from information_schema.TABLES where table_name like '$title_tablename%' and table_name <= '$target_tablename' order by table_name;";
     logger("INFO:START DROP TABLES (Target Table: $tablename%)");
     my $db_connection = DBI->connect("DBI:mysql:database=$name;host=$host",$user,$pass);
@@ -320,8 +321,6 @@ sub drop_table_byday
             my $rm_result = $db_connection->prepare($query);            
             $rm_result->execute or logger("ERROR:DROP TABLE $row[0] :$DBI::errstr");
             logger("DEBUG:Delete Table:Table Name = $row[0]");
-                
-
         }   
 
 
