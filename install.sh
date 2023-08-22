@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # 創建logs目錄
-mkdir -p /home/logs/TableHousekeeping/
+mkdir -p /home/logs/TableHousekeeping
 
 # 創建程式目錄
-mkdir -p /home/TableHousekeeping/
+mkdir -p /home/TableHousekeeping
 
 # 複製到指定目錄
 cp /tmp/TableHousekeeping/TableHousekeeping /home/TableHousekeeping/
