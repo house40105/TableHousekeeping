@@ -7,12 +7,12 @@ mkdir -p /home/logs/TableHousekeeping
 mkdir -p /home/TableHousekeeping
 
 # 複製到指定目錄
-cp /tmp/TableHousekeeping/TableHousekeeping /home/TableHousekeeping/
-chmod 754 /home/TableHousekeeping/TableHousekeeping.pl
+cp *.* /home/TableHousekeeping/
+chmod +x /home/TableHousekeeping/TableHousekeeping.pl
 
 
 LIST=`crontab -l`
-MEMO="### The Script is tableHousekeeping and syslog trogger"
+MEMO="### The Script is tableHousekeeping"
 SOURCE="/usr/bin/perl /home/TableHousekeeping/TableHousekeeping.pl > /dev/null"
 
 # 自動設定到Crontab (判斷是否crontab已有)
